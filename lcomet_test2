@@ -1,0 +1,59 @@
+#!/bin/bash
+
+number_of_tasks=128    #total number of processors: must match npe in parameters.f90
+ntasks_per_node=16     #number of processors per node. 
+number_of_nodes=8      #number of nodes*ntasks_per_node >= number_of_tasks
+
+sourdir=/oasis/scratch/comet/oasselin/temp_project/test2/source/   #Directory for the source
+datadir=/oasis/scratch/comet/oasselin/temp_project/test2/output/   #Direction for the output
+
+#Create those directorues is non existent
+mkdir -p $sourdir
+mkdir -p $datadir
+
+#Move to source directory 
+cd $sourdir
+
+#Load netCDF module
+export MODULEPATH=/home/oasselin/modulefiles:$MODULEPATH
+module load netcdf/v4.7.4f4.5.3
+
+#Execution step
+cat > EXEC_STEP << EXEC
+#!/bin/sh 
+
+#SBATCH --job-name="test2"
+#SBATCH --output="/home/oasselin/monitor/test2.o%j.%N"
+#SBATCH --partition=compute
+#SBATCH --nodes=$number_of_nodes
+#SBATCH --ntasks-per-node=$ntasks_per_node
+#SBATCH --export=ALL
+#SBATCH -t 02:00:00              
+#SBATCH -A TG-OCE190014 
+
+cd $datadir                                                                                                                                                                            
+cp $sourdir/exec_full $datadir   
+ibrun -n $number_of_tasks -v ./exec_full
+                                                                                                                                                       
+EXEC
+
+#Compiling step
+cat > COMPILE_STEP << COMPILE
+#!/bin/bash                                                                                                                                               
+
+#Copy all source files to source directory in scratch space                                                                                                                                                       
+cd $sourdir
+cp $HOME/qg_ybjp/*.f90 .            #Keeps a record of source files used
+cp $HOME/qg_ybjp/init_test2/* .    #Keeps a record of source files used
+cd $datadir
+cp $HOME/qg_ybjp/init_test2/* .    #Bring initial fields for initialization                                                                                                                                                                                                 
+cd $sourdir
+
+#Compile with MPIf90                                                                                                                                       
+mpif90 -mkl parameters_test2.f90 mpi.f90 fft.f90 files.f90 derivatives.f90 elliptic.f90 special.f90 diagnostics.f90 init.f90 -I$NETCDFHOME/include -I$HDF5HOME/include -L$NETCDFHOME/lib -L$HDF5HOME/lib IO_ncf.f90  main_waqg.f90 -o exec_full -lnetcdf -lnetcdff
+
+COMPILE
+
+chmod 755 COMPILE_STEP         #Allow compilation
+./COMPILE_STEP                 #Compile
+sbatch EXEC_STEP               #Comment this line if you want to compile code without executing
