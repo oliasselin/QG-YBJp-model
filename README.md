@@ -11,6 +11,7 @@ Brief overview of files
 
 #Essentials
 
+
 parametersXXX.f90: contains all the parameters determining the simulation.
 
 init.f90:          initialization of all basic arrays, stratification profile, initial condition for eddies and waves.
@@ -25,6 +26,7 @@ main_waqg.f90:     main program performing the integration
 
 #Under the hood
 
+
 elliptic.f90:      routines pertaining to inversion of q for psi, and LA for A. 
 
 derivatives.f90:   contains various subroutines computing derivatives and nonlinear terms via the transform method.
@@ -36,6 +38,7 @@ mpi.f90            all things parallelization via MPI
 
 
 #Deprecated
+
 
 diagnostic.f90:    contains a bunch of various old diagnostics (obsolete)
 
