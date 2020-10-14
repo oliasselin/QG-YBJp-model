@@ -9,27 +9,36 @@ Code written by Olivier Asselin
 Brief overview of files
 =======================
 
-Essentials
+#Essentials
 
 parametersXXX.f90: contains all the parameters determining the simulation.
+
 init.f90:          initialization of all basic arrays, stratification profile, initial condition for eddies and waves.
+
 IO_ncf.f90:        all things netCDF input/output.
+
 lcometXXX          compiling and job launching script
+
 main_waqg.f90:     main program performing the integration
 
 
 
-Under the hood
+#Under the hood
 
 elliptic.f90:      routines pertaining to inversion of q for psi, and LA for A. 
+
 derivatives.f90:   contains various subroutines computing derivatives and nonlinear terms via the transform method.
+
 fft.f90            all things Fourier transforms
+
 mpi.f90            all things parallelization via MPI
 
 
 
-Deprecated
+#Deprecated
 
 diagnostic.f90:    contains a bunch of various old diagnostics (obsolete)
+
 files.f90:         initialize all text files needed (obsolete)
+
 special.f90:       contains a couple special functions for diagnostics (obsolete)
